@@ -18,22 +18,42 @@
 #define ABS(x) (x < 0 ? -x : x)
 #define SIGN(x) (x < 0 ? -1 : 1)
 #define PI 3.141592653589793238463
+#define E 2.71828182845904523536
+#define DEG_TO_RAD(x) (x * (PI / 180.f))
+#define RAD_TO_DEG(x) (x * (180.f / PI))
+
+struct Vector4;
+
+
+// -- Random
+inline float randomFloatBetween(float min, float max) {
+    float random = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+    return (max - min) * random + min;
+}
+
+inline int randomIntBetween(int min, int max) {
+    return static_cast<int>(randomFloatBetween(min, max));
+}
 
 struct Vector2 {
     float x = 0;
     float y = 0;
 
+    Vector2();
+    Vector2(float inX, float inY);
     Vector2 operator+(Vector2 other);
     Vector2& operator+=(Vector2 other);
     Vector2 operator-(Vector2 other);
     Vector2 operator*(float s);
     Vector2 operator/(float s);
+	void operator=(const Vector4& other);
     float dot(Vector2 other);
     float length();
     Vector2 normalize();
     Vector2 negate();
     Vector2 getPerp();
     Vector2 rotate(float angle);
+    Vector2 rotateAround(float angle, const Vector2& other);
     float determinant(Vector2 other);
     
     void printDebug(const char* name);
@@ -58,10 +78,12 @@ struct Vector3 {
     Vector3 normalize();
 
     Vector3 operator+(const Vector3& v2);
+    Vector3& operator+=(Vector3 other);
     Vector3 operator-(const Vector3& v2);
     Vector3 operator-();
     Vector3 operator*(float value);
     Vector3 operator*(const Vector3& v2);
+    Vector3 operator/(const Vector3& v2);
     float operator[](int index);
     
     void printDebug(const char* name);
@@ -75,9 +97,11 @@ struct Vector4 {
 
     Vector4();
     Vector4(float value);
-    Vector4(float inX = 0.f, float inY = 0.f, float inZ = 0.f, float inW = 1.f);
+    Vector4(float inX, float inY, float inZ, float inW);
     Vector4 fromColor(float r, float g, float b, float a);
 	Vector4 toNormalizedColor();
+	Vector4(Vector2& v);
+	Vector4(Vector3& v);
 
     float length();
     Vector4 normalize();
@@ -88,6 +112,8 @@ struct Vector4 {
     Vector4 negate();
     Vector4 cross(const Vector4& other);
 
+	void operator=(const Vector2& v2);
+    void operator=(const Vector3& v2);
     Vector4 operator+(const Vector4& v2);
     Vector4 operator-(const Vector4& v2);
     Vector4 operator-();
@@ -97,6 +123,8 @@ struct Vector4 {
 
     void printDebug(const char* name);
 };
+
+Vector4 lerp(Vector4 start, Vector4 end, float t);
 
 struct Mat4x4 {
     float m[16] = {
@@ -126,11 +154,13 @@ struct Mat4x4 {
 };
 
 struct Quaternion {
+    float w = 1;
     float x = 0;
     float y = 0;
     float z = 0;
-    float w = 0;
 
+    Quaternion();
+    Quaternion(float inW, float inX, float inY, float inZ);
     float operator [](int index);
 	Quaternion operator*(const Quaternion& other) const;
 	Quaternion operator*(const float& scale) const;
@@ -141,4 +171,9 @@ struct Quaternion {
 	Quaternion normalize() const;
 	float length() const;
 	float dot(const Quaternion& other) const;
+
+    void printDebug(const char* name);
 };
+
+Quaternion quaternionFromRotation(Vector3 axis, float angleRadians);
+Quaternion quaternionFromEulerAngle(float yaw, float pitch, float roll);

@@ -12,6 +12,13 @@
 
 // ***************************************
 // Vector2
+Vector2::Vector2() { }
+
+Vector2::Vector2(float inX, float inY) {
+    x = inX;
+    y = inY;
+}
+
 Vector2 getRandomNormalVector2() {
     Vector2 retval = {
 		static_cast<float>(rand()) / static_cast<float>(RAND_MAX),
@@ -71,6 +78,16 @@ Vector2 Vector2::rotate(float angle) {
         x * cosf(angle) - y * sinf(angle),
         x * sinf(angle) + y * cosf(angle)
     };
+}
+
+Vector2 Vector2::rotateAround(float angle, const Vector2& other) {
+    Vector2 point = { x - other.x, y - other.y };
+    point = {
+        point.x * cosf(angle) - point.y * sinf(angle),
+        point.x * sinf(angle) + point.y * cosf(angle)
+    };
+    point = point + other;
+    return point;
 }
 
 void Vector2::printDebug(const char* name) {
@@ -155,6 +172,13 @@ Vector3 Vector3::operator+(const Vector3& v2) {
 	return add(v2);
 }
 
+Vector3& Vector3::operator+=(Vector3 other) {
+    x += other.x;
+    y += other.y;
+    z += other.z;
+    return *this;
+}
+
 Vector3 Vector3::operator-(const Vector3& v2) {
 	return subtract(v2);
 }
@@ -165,6 +189,14 @@ Vector3 Vector3::operator-() {
 
 Vector3 Vector3::operator*(float value) {
 	return scale(value);
+}
+
+Vector3 Vector3::operator/(const Vector3& v2) {
+    return {
+        x / v2.x,
+        y / v2.y,
+        z / v2.z        
+    };
 }
 
 Vector3 Vector3::operator*(const Vector3& v2) {
@@ -188,6 +220,10 @@ float Vector3::operator [](int index) {
 	}
 }
 
+void Vector2::operator=(const Vector4& other) {
+	x = other.x;
+	y = other.y;
+}
 
 void Vector3::printDebug(const char* name) {
     printf("%s=Vector3(%f, %f, %f)\n", name, x, y, z);
@@ -210,6 +246,20 @@ Vector4::Vector4(float inX, float inY, float inZ, float inW) {
     y = inY;
     z = inZ;
     w = inW;
+}
+
+Vector4::Vector4(Vector2& v) {
+	x = v.x;
+	y = v.y;
+	z = 0;
+	w = 1;
+}
+
+Vector4::Vector4(Vector3& v) {
+	x = v.x;
+	y = v.y;
+	z = v.z;
+	w = 1;
 }
 
 Vector4 Vector4::fromColor(float r, float g, float b, float a) {
@@ -274,6 +324,24 @@ Vector4 Vector4::cross(const Vector4& other) {
 		x * other.y - y * other.x,
 		1.f
 	};
+}
+
+Vector4 lerp(Vector4 start, Vector4 end, float t) {
+    return (end - start) * t + start;
+}
+
+void Vector4::operator=(const Vector2& v2) {
+	x = v2.x;
+	y = v2.y;
+	z = 0;
+	w = 1;
+}
+
+void Vector4::operator=(const Vector3& v2) {
+	x = v2.x;
+	y = v2.y;
+	z = v2.z;
+	w = 1;	
 }
 
 Vector4 Vector4::operator+(const Vector4& v2) {
@@ -506,6 +574,14 @@ void Mat4x4::print() {
 
 // ***************************************
 // Quaternion
+Quaternion::Quaternion() { };
+
+Quaternion::Quaternion(float inW, float inX, float inY, float inZ) {
+    w = inW;
+    x = inX;
+    y = inY;
+    z = inZ;
+}
 
 float Quaternion::operator [](int index) {
 	switch (index) {
@@ -597,6 +673,32 @@ Quaternion Quaternion::normalize() const {
 	};
 }
 
+/*Mat4x4 Quaternion::toMatrix() const {
+	return {
+		{
+			1 - 2 * (y * y - z * z), 
+			2 * (x * y - z * w),
+            2 * (x * z + w * y),
+            0,
+
+            2 * (x * y + w * z),
+            1 - 2 * (x * x - z * z),
+            2 * (y * z - w * x),
+            0,
+
+            2 * (x * z - w * y),
+            2 * (y * z + w * x),
+            1 - 2 * (x * x - y * y),
+			0,
+
+			0,
+			0,
+			0,
+			1
+		}
+	};
+}*/
+
 Mat4x4 Quaternion::toMatrix() const {
 	return {
 		{
@@ -622,4 +724,37 @@ Mat4x4 Quaternion::toMatrix() const {
 
 float Quaternion::dot(const Quaternion& other) const {
 	return w * other.w + x * other.x + y * other.y + z * other.z;
+}
+
+Quaternion quaternionFromRotation(Vector3 axis, float angleRadians) {
+    float halfAngleRadians = angleRadians / 2.f;
+    float cosHalfAngRad = cosf(halfAngleRadians);
+    float sinHalfAngRad = sinf(halfAngleRadians);
+
+    return {
+        cosHalfAngRad,
+        axis.x * sinHalfAngRad,
+        axis.y * sinHalfAngRad,
+        axis.z * sinHalfAngRad
+    };
+}
+
+Quaternion quaternionFromEulerAngle(float yaw, float pitch, float roll) {
+    float cy = cosf(yaw * 0.5f);
+    float sy = sinf(yaw * 0.5f);
+    float cp = cosf(pitch * 0.5f);
+    float sp = sinf(pitch * 0.5f);
+    float cr = cosf(roll * 0.5f);
+    float sr = sinf(roll * 0.5f);
+
+    return {
+        cr * cp * cy + sr * sp * sy,
+        sr * cp * cy - cr * sp * sy,
+        cr * sp * cy + sr * cp * sy,
+        cr * cp * sy - sr * sp * cy
+    };
+}
+
+void Quaternion::printDebug(const char* name) {
+    printf("%s=Quaternion(%f, %f, %f, %f)\n", name, x, y, z, w);
 }
