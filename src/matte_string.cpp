@@ -73,11 +73,13 @@ namespace matte {
         string_clear(s);
     }
 
-    String& operator=(const char* other) {
+    String& String::operator=(const char* other) {
         set_string(*this, other);
+        return *this;
     }
 
-    String& operator=(const String& other) {
+    String& String::operator=(const String& other) {
         set_string(*this, string_c_value(other));
+        return *this;
     }
 };

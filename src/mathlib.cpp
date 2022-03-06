@@ -422,35 +422,35 @@ Mat4x4 Mat4x4::translateByVec2(Vector2 v) {
 
 Mat4x4 Mat4x4::rotate2D(float angle) {
     Mat4x4 result = copy();
-    result.m[0] = cos(angle);
-    result.m[1] = -sin(angle);
-    result.m[4] = sin(angle);
-    result.m[5] = cos(angle);
+    result.m[0] = cosf(angle);
+    result.m[1] = -sinf(angle);
+    result.m[4] = sinf(angle);
+    result.m[5] = cosf(angle);
     return result;
 }
 
 Mat4x4 Mat4x4::getXRotationMatrix(float angleRadians) {
     return {
         { 1, 0, 0, 0,
-          0, cos(angleRadians), -sin(angleRadians), 0,
-          0, sin(angleRadians), cos(angleRadians), 0,
+          0, cosf(angleRadians), -sinf(angleRadians), 0,
+          0, sinf(angleRadians), cosf(angleRadians), 0,
           0, 0, 0, 1 }
     };
 }
 
 Mat4x4 Mat4x4::getYRotationMatrix(float angleRadians) {
     return {
-        { cos(angleRadians), 0, sin(angleRadians), 0,
+        { cosf(angleRadians), 0, sinf(angleRadians), 0,
           0, 1, 0, 0,
-          -sin(angleRadians), 0, cos(angleRadians), 0,
+          -sinf(angleRadians), 0, cosf(angleRadians), 0,
           0, 0, 0, 1 }
     };
 }
 
 Mat4x4 Mat4x4::getZRotationMatrix(float angleRadians) {
     return {
-        { cos(angleRadians), -sin(angleRadians), 0, 0,
-          sin(angleRadians), cos(angleRadians), 0, 0,
+        { cosf(angleRadians), -sinf(angleRadians), 0, 0,
+          sinf(angleRadians), cosf(angleRadians), 0, 0,
           0, 0, 1, 0,
           0, 0, 0, 1 }
     };
@@ -651,12 +651,12 @@ Quaternion Quaternion::interpolate(const Quaternion& other, const float factor) 
 		return (*this + ((newOther - *this) * factor)).normalize();
 	}
 
-	float thetaZero = acos(dotProduct); // angle between input vectors
+	float thetaZero = acosf(dotProduct); // angle between input vectors
 	float theta = thetaZero * factor;
 
 	Quaternion v2 = (newOther - (*this * dotProduct)).normalize();
 
-	return (*this * cos(theta)) + (v2 * sin(theta));
+	return (*this * cosf(theta)) + (v2 * sinf(theta));
 }
 
 float Quaternion::length() const {
