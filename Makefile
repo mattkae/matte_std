@@ -4,7 +4,7 @@ ODIR = obj
 SDIR = src
 INC = -Iinc
 
-_OBJS = mathlib.o logger.o matte_string.o matte_stringbuilder.o
+_OBJS = mathlib.o logger.o matte_string.o matte_stringbuilder.o hashmap.o stack.o
 OBJS = $(patsubst %,$(ODIR)/%,$(_OBJS))
 
 

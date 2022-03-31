@@ -1,4 +1,5 @@
 #pragma once
+#include "matte_string.h"
 
 namespace matte {
     struct SbBuffer {
