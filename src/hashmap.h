@@ -45,7 +45,7 @@ struct HashBucket {
         grow();
         HashedElement<K, V> v;
         v.key = key;
-        memcpy(&v.element, &element, sizeof(V));
+        v.element = element;
         v.hashCode = hashCode;
         elements[numElements] = v;
         numElements++;
@@ -104,7 +104,7 @@ struct HashMap {
     HashBucket<K, V>* buckets = NULL;
     i32 numBuckets = 0;
 
-    HashMap(i32 bucketCount = 16) {
+    void init(i32 bucketCount = 16) {
         buckets = new HashBucket<K, V>[bucketCount];
         numBuckets = bucketCount;
 
